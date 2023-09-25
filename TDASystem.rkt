@@ -11,18 +11,74 @@
 
 (define (system name initialChatbotCodeLink . chatbots)
   (let* ((creationDate (current-inexact-milliseconds))
-         (chatHistory (make-hash)))
-    (define (get-chatHistory user)
-      (hash-ref chatHistory user '()))
+         (chatHistory '())
+         (users '()))
 
-    (define (update-chatHistory! user message)
+    (define (get-chatHistory user)
+      (cond
+        ((equal? (car chatHistory) user) (cdr chatHistory))
+        (else (cons user '()))))
+
+    (define (update-chatHistory user message)
       (let* ((timestamp (current-inexact-milliseconds))
              (formatted-timestamp (format "~a" timestamp))
-             (entry (list formatted-timestamp message 'system)))
-        (let ((current-history (get-chatHistory user)))
-          (hash-set! chatHistory user (cons entry current-history)))))
+             (entry (list formatted-timestamp message 'user)))
 
-    (list name initialChatbotCodeLink chatbots creationDate get-chatHistory update-chatHistory!)))
+        (cond
+          ((equal? (car chatHistory) user)
+           (cons user (cons entry (cdr chatHistory))))
+
+          (else (cons user (list entry))))))
+
+    (define (get-users)
+      users)
+
+    (define (add-user user)
+      (if (not (member user users))
+          (cons user users)
+          users))
+
+    (define (add-chatbot chatbot)
+      (cons chatbot chatbots))
+
+    (list name initialChatbotCodeLink chatbots creationDate get-chatHistory update-chatHistory get-users add-user add-chatbot)))
+
+;______________________________________________________________________________________________________
+
+(define (system-add-chatbot sys chatbot)
+  (let* ((name (car sys))
+         (initialChatbotCodeLink (cadr sys))
+         (chatbots (caddr sys))
+         (creationDate (cadddr sys))
+         (get-chatHistory (fifth sys))
+         (update-chatHistory! (sixth sys))
+         (get-users (seventh sys))
+         (add-user (eighth sys))
+         (add-chatbot (ninth sys)))
+
+    (if (not (member chatbot chatbots))
+        (list name initialChatbotCodeLink (cons chatbot chatbots) creationDate get-chatHistory update-chatHistory! get-users add-user add-chatbot)
+        sys)))
+
+;______________________________________________________________________________________________________
+
+(define (system-add-user sys user)
+  (let* ((name (car sys))
+         (initialChatbotCodeLink (cadr sys))
+         (chatbots (caddr sys))
+         (creationDate (cadddr sys))
+         (get-chatHistory (fifth sys))
+         (update-chatHistory! (sixth sys))
+         (get-users (seventh sys))
+         (add-user (eighth sys))
+         (add-chatbot (ninth sys)))
+
+    (if (not (member user (get-users)))
+        (list name initialChatbotCodeLink chatbots creationDate get-chatHistory update-chatHistory! (cons user (get-users)) add-user add-chatbot)
+        sys)))
+
+
+
 
 
 
