@@ -1,5 +1,8 @@
 #lang racket
 
+(provide flow)
+(provide flow-add-option)
+
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: id (int) X name (String)  X Option*

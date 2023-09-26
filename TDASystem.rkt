@@ -1,7 +1,8 @@
 #lang racket
 
-
-
+(provide system)
+(provide system-add-chatbot)
+(provide system-add-user)
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: name (string) X InitialChatbotCodeLink (Int) X chatbot*

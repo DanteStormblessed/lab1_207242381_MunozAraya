@@ -1,8 +1,11 @@
 #lang racket
 
+
+
+(provide option)
+
+
 ;La funcion "option" tiene como finalidad la construccion de opciones para el flujo de un Chatbot
-
-
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: code (Int)  X message (String)  X ChatbotCodeLink (Int) X FlowCodeLink (Int) X Keyword

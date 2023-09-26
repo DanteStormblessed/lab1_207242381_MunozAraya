@@ -1,4 +1,7 @@
 #lang racket
+
+(provide chatbot)
+(provide chatbot-add-flow)
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: chatbotID (int) X name (String) X welcomeMessage (String) X startFlowId(int) X  flows*
