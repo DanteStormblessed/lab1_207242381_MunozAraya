@@ -2,6 +2,9 @@
 
 (provide chatbot)
 (provide chatbot-add-flow)
+(provide chatbot-exists?)
+(provide chatbot-code-exists?)
+(provide find-chatbot-by-id)
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: chatbotID (int) X name (String) X welcomeMessage (String) X startFlowId(int) X  flows*
@@ -30,5 +33,25 @@
     (if (null? flows)
         (append chatbot (list flow))
         (add-flow-helper chatbot flows))))
+;____________________________________________________________________
+
+(define (chatbot-exists? chatbots code)
+  (cond
+    ((null? chatbots) #f)
+    ((= (car chatbots) code) #t)
+    (else (chatbot-exists? (cdr chatbots) code))))
+;____________________________________________________________________
+(define (chatbot-code-exists? chatbots code)
+  (cond
+    ((null? chatbots) #f)
+    ((= (car (car chatbots)) code) #t)
+    (else (chatbot-code-exists? (cdr chatbots) code))))
+;____________________________________________________________________
+(define (find-chatbot-by-id chatbots id)
+  (cond
+    ((null? chatbots) #f)
+    ((= (car chatbots) id) (car chatbots))
+    (else (find-chatbot-by-id (cdr chatbots) id))))
+
 
 

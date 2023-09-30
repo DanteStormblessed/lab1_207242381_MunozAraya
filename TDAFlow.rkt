@@ -1,8 +1,9 @@
 #lang racket
 
+
 (provide flow)
 (provide flow-add-option)
-
+(provide find-flow-by-id)
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: id (int) X name (String)  X Option*
@@ -25,3 +26,10 @@
     (if (not (member option options)) 
         (cons (car flow) (cadr flow) (cons option options)) 
         flow)))
+
+
+(define (find-flow-by-id flows id)
+  (cond
+    ((null? flows) #f)
+    ((= (caar flows) id) (car flows))
+    (else (find-flow-by-id (cdr flows) id))))
