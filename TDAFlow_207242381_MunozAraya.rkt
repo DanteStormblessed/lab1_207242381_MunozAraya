@@ -4,6 +4,7 @@
 (provide flow)
 (provide flow-add-option)
 (provide find-flow-by-id)
+(provide remove-duplicates)
 ;__________________________________CONSTRUCTOR__________________________________
 
 ;Dominio: id (int) X name (String)  X Option*
@@ -12,8 +13,7 @@
 ;Tipo de recursion: No aplica
 
 (define (flow id name . options)
-  (list id name options))
-
+  (list id name (remove-duplicates options)))
 ;__________________________________MODIFICADOR__________________________________
 
 ;Dominio: flow X option
@@ -22,10 +22,20 @@
 ;Tipo de recursion: No aplica
 
 (define (flow-add-option flow option)
-  (let ((options (cddr flow)))
-    (if (not (member option options)) 
-        (cons (car flow) (cadr flow) (cons option options)) 
-        flow)))
+  (let* ((id (car option))
+         (new-options (remove-duplicates (cons option (caddr flow)))))
+    (list (car flow) (cadr flow) new-options)))
+
+
+(define (remove-flow-by-id flows id)
+  (filter (lambda (f) (not (= (car f) id))) flows))
+
+(define (remove-duplicates lst)
+  (if (null? lst)
+      '()
+      (cons (car lst)
+            (remove-duplicates (filter (lambda (item) (not (equal? (car item) (car (car lst))))) (cdr lst))))))
+
 
 
 (define (find-flow-by-id flows id)
@@ -33,3 +43,6 @@
     ((null? flows) #f)
     ((= (caar flows) id) (car flows))
     (else (find-flow-by-id (cdr flows) id))))
+;____________________________________________________________________
+
+

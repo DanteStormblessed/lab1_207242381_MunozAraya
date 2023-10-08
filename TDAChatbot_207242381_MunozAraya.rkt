@@ -13,7 +13,8 @@
 ;Tipo de recursion: No aplica
 
 (define (chatbot chatbotID name welcomeMessage startFlowID . flows)
-  (list chatbotID name welcomeMessage startFlowID flows))
+  (list chatbotID name welcomeMessage startFlowID (remove-duplicates flows)))
+
 ;__________________________________MODIFICADOR__________________________________
 
 ;Dominio: chatbot X flow
@@ -26,13 +27,14 @@
     (if (null? flows)
         (append chatbot (list flow))
         (let ((current-flow (car flows)))
-          (if (= (cadr current-flow) (cadr flow))
+          (if (= (car current-flow) (car flow))
               chatbot
               (add-flow-helper chatbot (cdr flows))))))
-  (let ((flows (cddr chatbot)))
+  (let ((flows (cdddr chatbot)))
     (if (null? flows)
         (append chatbot (list flow))
         (add-flow-helper chatbot flows))))
+
 ;____________________________________________________________________
 
 (define (chatbot-exists? chatbots code)
