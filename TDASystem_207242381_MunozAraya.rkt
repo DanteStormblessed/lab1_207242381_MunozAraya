@@ -15,11 +15,13 @@
 (provide synthesize-chatHistory)
 
 
-(define (myRandom Xn)
-  (modulo (+ (* 1103515245 Xn) 12345) 2147483648)
-)
+;________________________________________________________________________________________________________
 
-;; TDA system - constructor
+;Dominio: name X initialChatbotCodeLink X . chatbots
+;Recorrido: System
+;Descripcion: Crea un nuevo sistema de chatbots con el nombre name, un 
+;enlace de código inicial initialChatbotCodeLink y una lista opcional de chatbots chatbots.
+;Tipo de recursion: No aplica
 (define (system name initialChatbotCodeLink . chatbots)
   (define (add-chatbots chatbots chatbot-list chatbot-codes)
     (if (null? chatbots)
@@ -34,10 +36,15 @@
   (let* ((chatbot-list-and-codes (add-chatbots chatbots '() '()))
          (chatbot-list (car chatbot-list-and-codes))
          (chatbot-codes (cadr chatbot-list-and-codes)))
-    (list name initialChatbotCodeLink chatbot-list chatbot-codes '() #f)))
+    (list name initialChatbotCodeLink chatbot-list chatbot-codes '() '() '())))
 
 
-;; TDA system - modificador para añadir chatbots a un sistema
+;________________________________________________________________________________________________________
+
+;Dominio: System X chatbot
+;Recorrido: System
+;Descripcion: Añade un chatbot al sistema, primero verifica si el chatbot existe.
+;Tipo de recursion: No aplica
 (define (system-add-chatbot system chatbot)
   (define (chatbot-exists? chatbot-codes chatbotID)
     (if (null? chatbot-codes)
@@ -56,8 +63,11 @@
               (fifth system)
               (sixth system)))))
 
-
-;; TDA system - modificador para añadir usuarios a un sistema
+;________________________________________________________________________________________________________
+;Dominio: System X user
+;Recorrido: System
+;Descripcion: añade un usuario al sistema comprobando si existe
+;Tipo de recursion: No aplica
 (define (system-add-user system user)
   (define (user-exists? users user)
     (if (null? users)
@@ -76,8 +86,11 @@
               (sixth system)))))
 
 
-
-;; TDA system - función que permite iniciar una sesión en el sistema
+;________________________________________________________________________________________________________
+;Dominio: System X user
+;Recorrido: System
+;Descripcion: Verifica si existe el usuario, para añadir un parámetro al sistema con el usuario logeado
+;Tipo de recursion: No aplica
 (define (system-login system user)
   (define (user-exists? users user)
     (if (null? users)
@@ -94,9 +107,13 @@
               (third system)
               (fourth system)
               (fifth system)
-              user))))
-
-;; TDA system - función que permite cerrar una sesión abierta
+              user))));aqui se añade el usuario al system como un nuevo parametro
+;________________________________________________________________________________________________________
+;Dominio: System
+;Recorrido: System
+;Descripcion: Cierra la sesión del usuario en el sistema, quita el parámetro añadido a 
+;system, devolviendo un #f en ese caso
+;Tipo de recursion: No aplica
 (define (system-logout system)
   (list (first system)
         (second system)
@@ -104,28 +121,39 @@
         (fourth system)
         (fifth system)
         #f))
+;________________________________________________________________________________________________________
 
-
-;; system-talk-rec - Función que permite interactuar con un chatbot (usando recursividad)
+;Dominio: System X message
+;Recorrido: System
+;Descripcion: Permite interactuar con el sistema, toma en cuenta el flujo inicial, además 
+;de un mensaje inicial dado por el usuario, trabaja de forma recursiva gracias a la función Chathistory
+;Tipo de recursion: la recursion se hace en update-chatHistory
 (define (system-talk-rec system message)
-  (if (sixth system)
-      (let ((logged-user (sixth system)))
-        (if (find-chatbot-by-id (third system) logged-user)
-            (let* ((chatHistory (seventh system))
-                   (new-history (update-chatHistory chatHistory logged-user message)))
-              (list (first system)
-                    (second system)
-                    (third system)
-                    (fourth system)
-                    (fifth system)
-                    logged-user
-                    new-history))
-            system))
-      system))
+  (let ((logged-user (sixth system)))
+    (if logged-user
+        (let ((chatbot (find-chatbot-by-id (third system) (second system))))
+          (if chatbot
+              (let* ((chatHistory (seventh system))
+                     (new-history (update-chatHistory chatHistory logged-user message)))
+                (list (first system)
+                      (second system)
+                      (third system)
+                      (fourth system)
+                      (fifth system)
+                      logged-user
+                      new-history))
+              system))
+        system)))
 
 
 
-;; system-talk-norec - Función que permite interactuar con un chatbot (implementación declarativa)
+;________________________________________________________________________________________________________
+
+;Dominio: System X message
+;Recorrido: System
+;Descripcion: Permite interactuar con el sistema, toma en cuenta el flujo inicial, además 
+;de un mensaje inicial dado por el usuario
+;Tipo de recursion: no aplica
 (define (system-talk-norec system message)
   (if (sixth system)
       (let ((logged-user (sixth system)))
@@ -143,8 +171,13 @@
           system)
       system)
 )
+;________________________________________________________________________________________________________
 
-;; system-synthesis - Función que ofrece una síntesis del chatbot para un usuario particular
+;Dominio: System X user
+;Recorrido: list
+;Descripcion: ofrece una síntesis del sistema, formeateado a una lista de strings para 
+;poder ser visualizado con Display
+;Tipo de recursion: no aplica
 (define (system-synthesis system user)
   (if (sixth system)
       (let* ((logged-user (sixth system))
@@ -155,8 +188,12 @@
           '())
       '())
 )
-
-;; system-simulate - Función para simular un diálogo entre dos chatbots
+;________________________________________________________________________________________________________
+;Dominio: system X maxInteractions X seed
+;Recorrido: list
+;Descripcion: Función para poder simular un dialogo entre dos chatbos, usa una semilla 
+;que se genera con la función myrandom, además de un número máximo de interacciones
+;Tipo de recursion: no aplica
 (define (system-simulate system maxInteractions seed)
   (if (sixth system)
       (let* ((logged-user (sixth system))
@@ -167,13 +204,26 @@
           '())
       '())
 )
-;____________________________________________________________________________________
+;________________________________________________________________________________________________________
+
+;Dominio: chatHistory X user X message
+;Recorrido: list
+;Descripcion: función que permite actualizar el historial del chat, se llama cada vez 
+;que se añade un mensaje en el sistema, permite que no se pierdan los mensajes anteriores
+;Tipo de recursion: no aplica
 (define (update-chatHistory chatHistory user message)
   (let* ((timestamp (current-inexact-milliseconds))
          (formatted-timestamp (format "~a" timestamp))
          (entry (list formatted-timestamp message 'system)))
-    (hash-set! chatHistory user (cons entry (hash-ref chatHistory user '())))))
-;____________________________________________________________________________________
+    (append chatHistory (list (list user entry)))))
+
+;________________________________________________________________________________________________________
+
+;Dominio: system maxInteractions seed
+;Recorrido: list
+;Descripcion: función que toma un historial de chat y lo reformatea para 
+;presentarlo de manera diferente
+;Tipo de recursion: no aplica
 (define (synthesize-chatHistory chatHistory)
   (let loop ((entries (hash->list chatHistory))
              (result '()))
@@ -187,9 +237,15 @@
          (loop (cdr entries)
                (cons (list timestamp message sender) result)))))))
 
+;________________________________________________________________________________________________________
 
-
-;____________________________________________________________________________________
+;Dominio: system X maxInteractions X seed
+;Recorrido: system X maxInteractions X seed
+;Descripcion: Esta función simula un diálogo entre dos chatbots en el sistema. Utiliza 
+;un máximo de interacciones especificado y una semilla para la generación de números 
+;aleatorios. La simulación de diálogo entre chatbots implica que los chatbots intercambien 
+;mensajes, elijan opciones y naveguen a través de flujos predefinidos
+;Tipo de recursion: no aplica
 (define (simulate-dialogue system maxInteractions seed)
   (let* ((logged-user (sixth system))
          (chatHistory (seventh system))
@@ -218,5 +274,8 @@
         '())
     )
 )
-
+;________________________________________________________________________________________________________
+(define (myRandom Xn)
+  (modulo (+ (* 1103515245 Xn) 12345) 2147483648)
+)
 

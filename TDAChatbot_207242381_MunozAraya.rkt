@@ -3,9 +3,8 @@
 (provide chatbot)
 (provide chatbot-add-flow)
 (provide chatbot-exists?)
-(provide chatbot-code-exists?)
 (provide find-chatbot-by-id)
-;__________________________________CONSTRUCTOR__________________________________
+;__________________________________CONSTRUCTOR___________________________________________________________
 
 ;Dominio: chatbotID (int) X name (String) X welcomeMessage (String) X startFlowId(int) X  flows*
 ;Recorrido: chatbot
@@ -14,8 +13,7 @@
 
 (define (chatbot chatbotID name welcomeMessage startFlowID . flows)
   (list chatbotID name welcomeMessage startFlowID (remove-duplicates flows)))
-
-;__________________________________MODIFICADOR__________________________________
+;__________________________________MODIFICADOR___________________________________________________________
 
 ;Dominio: chatbot X flow
 ;Recorrido: chatbot
@@ -34,26 +32,30 @@
     (if (null? flows)
         (append chatbot (list flow))
         (add-flow-helper chatbot flows))))
+;________________________________________________________________________________________________________
 
-;____________________________________________________________________
-
+;Dominio: chatbot X code
+;Recorrido: Bool
+;Descripcion: verifica si un chatbot con un código específico existe en la lista de chatbots proporcionada como argumento.
+;Tipo de recursion: Recursion de cola
 (define (chatbot-exists? chatbots code)
   (cond
     ((null? chatbots) #f)
-    ((= (car chatbots) code) #t)
-    (else (chatbot-exists? (cdr chatbots) code))))
-;____________________________________________________________________
-(define (chatbot-code-exists? chatbots code)
-  (cond
-    ((null? chatbots) #f)
     ((= (car (car chatbots)) code) #t)
-    (else (chatbot-code-exists? (cdr chatbots) code))))
-;____________________________________________________________________
+    (else (chatbot-exists? (cdr chatbots) code))))
+;________________________________________________________________________________________________________
+
+;Dominio: chatbot X code
+;Recorrido: chatbot X bool
+;Descripcion:  itera recursivamente sobre la lista de chatbots y compara la identificación (ID) del chatbot actual con la ID proporcionada.
+;Si encuentra un chatbot con la misma ID, devuelve ese chatbot. Si no encuentra ninguna coincidencia, devuelve #f.
+;Tipo de recursion: Recursion de cola
 (define (find-chatbot-by-id chatbots id)
   (cond
     ((null? chatbots) #f)
-    ((= (car chatbots) id) (car chatbots))
+    ((= (car (car chatbots)) id) (car chatbots))
     (else (find-chatbot-by-id (cdr chatbots) id))))
+
 
 
 
